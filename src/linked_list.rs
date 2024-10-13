@@ -28,6 +28,13 @@ impl LinkedList {
         self.size == 0
     }
 
+    pub fn front(&self) -> Option<i32> {
+        match &self.root {
+            Some(first_node) => Some(first_node.value),
+            None => None,
+        }
+    }
+
     pub fn push_front(&mut self, input: i32) {
         let old_root = take(&mut self.root);
         let new_node = Node {
@@ -100,6 +107,15 @@ mod test {
         list.push_front(5);
 
         assert_eq!(list.is_empty(), false);
+    }
+
+    #[test]
+    fn front_peeks_at_the_first_value_in_list() {
+        let mut list = LinkedList::new();
+        list.push_front(3);
+        list.push_front(2);
+
+        assert_eq!(list.front(), Some(2));
     }
 
     #[test]
