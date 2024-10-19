@@ -79,6 +79,18 @@ impl From<&[i32]> for LinkedList {
     }
 }
 
+impl Into<Vec<i32>> for LinkedList {
+    fn into(mut self) -> Vec<i32> {
+        let mut output = Vec::new();
+
+        while let Some(item) = self.pop_front() {
+            output.push(item);
+        }
+
+        output
+    }
+}
+
 impl PartialEq for LinkedList {
     fn eq(&self, other: &Self) -> bool {
         self.root == other.root && self.size == other.size
@@ -303,6 +315,26 @@ mod test {
             })),
             size: 3,
         };
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn construct_vector_from_linked_list() {
+        let input = LinkedList {
+            root: Some(Box::new(Node {
+                value: 1,
+                next: Some(Box::new(Node {
+                    value: 2,
+                    next: Some(Box::new(Node {
+                        value: 3,
+                        next: None,
+                    })),
+                })),
+            })),
+            size: 3,
+        };
+        let expected = vec![1, 2, 3];
+        let actual: Vec<i32> = input.into();
         assert_eq!(expected, actual);
     }
 }
