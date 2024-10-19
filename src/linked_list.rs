@@ -55,6 +55,30 @@ impl LinkedList {
     }
 }
 
+impl From<Vec<i32>> for LinkedList {
+    fn from(value: Vec<i32>) -> Self {
+        let mut output = LinkedList::new();
+
+        for item in value.into_iter().rev() {
+            output.push_front(item);
+        }
+
+        output
+    }
+}
+
+impl From<&[i32]> for LinkedList {
+    fn from(value: &[i32]) -> Self {
+        let mut output = LinkedList::new();
+
+        for item in value.iter().cloned().rev() {
+            output.push_front(item);
+        }
+
+        output
+    }
+}
+
 impl PartialEq for LinkedList {
     fn eq(&self, other: &Self) -> bool {
         self.root == other.root && self.size == other.size
@@ -238,5 +262,47 @@ mod test {
         };
 
         assert_ne!(c, d);
+    }
+
+    #[test]
+    fn construct_linked_list_from_vector() {
+        let input: Vec<i32> = vec![1, 2, 3];
+        let actual = LinkedList::from(input);
+        // let actual = input.into();
+        let expected = LinkedList {
+            root: Some(Box::new(Node {
+                value: 1,
+                next: Some(Box::new(Node {
+                    value: 2,
+                    next: Some(Box::new(Node {
+                        value: 3,
+                        next: None,
+                    })),
+                })),
+            })),
+            size: 3,
+        };
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn construct_linked_list_from_vector_without_taking_ownership() {
+        let input = [1, 2, 3];
+        let actual = LinkedList::from(input.as_slice());
+        // let actual = input.into();
+        let expected = LinkedList {
+            root: Some(Box::new(Node {
+                value: 1,
+                next: Some(Box::new(Node {
+                    value: 2,
+                    next: Some(Box::new(Node {
+                        value: 3,
+                        next: None,
+                    })),
+                })),
+            })),
+            size: 3,
+        };
+        assert_eq!(expected, actual);
     }
 }
