@@ -53,6 +53,18 @@ impl LinkedList {
         self.size -= 1;
         Some(popped_node.value)
     }
+
+    pub fn back(&self) -> Option<i32> {
+        let Some(root_node) = self.root.as_ref() else {
+            return None;
+        };
+
+        let mut last = root_node.as_ref();
+        while let Some(next) = last.next.as_ref() {
+            last = next.as_ref();
+        }
+        Some(last.value)
+    }
 }
 
 impl From<Vec<i32>> for LinkedList {
@@ -105,6 +117,8 @@ impl PartialEq for Node {
 
 #[cfg(test)]
 mod test {
+    use std::vec;
+
     use super::*;
 
     #[test]
@@ -212,6 +226,12 @@ mod test {
         let mut actual = LinkedList::new();
         assert_eq!(actual.pop_front(), None);
         assert_eq!(actual.length(), 0)
+    }
+
+    #[test]
+    fn back_returns_an_option_of_the_last_value() {
+        let input = LinkedList::from(vec![1, 2, 3]);
+        assert_eq!(input.back(), Some(3));
     }
 
     #[test]
