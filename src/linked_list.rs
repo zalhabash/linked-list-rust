@@ -1,5 +1,3 @@
-use std::mem::take;
-
 #[derive(Debug)]
 pub struct LinkedList {
     root: Option<Box<Node>>,
@@ -36,19 +34,21 @@ impl LinkedList {
     }
 
     pub fn push_front(&mut self, input: i32) {
-        let old_root = take(&mut self.root);
+        let old_root = self.root.take();
         let new_node = Node {
             next: old_root,
             value: input,
         };
+
         self.root = Some(Box::new(new_node));
         self.size += 1;
     }
 
     pub fn pop_front(&mut self) -> Option<i32> {
-        let Some(popped_node) = take(&mut self.root) else {
+        let Some(popped_node) = self.root.take() else {
             return None;
         };
+
         self.root = popped_node.next;
         self.size -= 1;
         Some(popped_node.value)
@@ -71,17 +71,43 @@ impl LinkedList {
             next: None,
             value: input,
         }));
+
         let Some(root_node) = self.root.as_mut() else {
             self.root = new_node;
             self.size += 1;
             return;
         };
+
         let mut last = root_node.as_mut();
         while last.next.is_some() {
             last = last.next.as_mut().unwrap();
         }
         last.next = new_node;
         self.size += 1;
+    }
+
+    pub fn pop_back(&mut self) -> Option<i32> {
+        let Some(root_node) = self.root.as_mut() else {
+            return None;
+        };
+
+        if root_node.next.is_none() {
+            let taken = self.root.take();
+            self.size -= 1;
+            return Some(taken.unwrap().value);
+        }
+
+        let mut second_to_last = root_node.as_mut();
+        while second_to_last
+            .next
+            .as_ref()
+            .is_some_and(|last| last.next.is_some())
+        {
+            second_to_last = second_to_last.next.as_mut().unwrap();
+        }
+        let taken = second_to_last.next.take();
+        self.size -= 1;
+        return Some(taken.unwrap().value);
     }
 }
 
@@ -266,6 +292,20 @@ mod test {
         actual.push_back(2);
         actual.push_back(3);
         assert_eq!(actual, LinkedList::from(vec![1, 2, 3]));
+    }
+
+    #[test]
+    fn pop_back_returns_nothing_for_empty_linked_list() {
+        let mut actual = LinkedList::new();
+        assert_eq!(actual.pop_back(), None);
+        assert_eq!(actual, LinkedList::new());
+    }
+
+    #[test]
+    fn pop_back_returns_last_element() {
+        let mut actual = LinkedList::from(vec![1, 2, 3]);
+        assert_eq!(actual.pop_back(), Some(3));
+        assert_eq!(actual, LinkedList::from(vec![1, 2]));
     }
 
     #[test]
