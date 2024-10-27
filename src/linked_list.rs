@@ -65,6 +65,24 @@ impl LinkedList {
         }
         Some(last.value)
     }
+
+    pub fn push_back(&mut self, input: i32) {
+        let new_node = Some(Box::new(Node {
+            next: None,
+            value: input,
+        }));
+        let Some(root_node) = self.root.as_mut() else {
+            self.root = new_node;
+            self.size += 1;
+            return;
+        };
+        let mut last = root_node.as_mut();
+        while last.next.is_some() {
+            last = last.next.as_mut().unwrap();
+        }
+        last.next = new_node;
+        self.size += 1;
+    }
 }
 
 impl From<Vec<i32>> for LinkedList {
@@ -232,6 +250,22 @@ mod test {
     fn back_returns_an_option_of_the_last_value() {
         let input = LinkedList::from(vec![1, 2, 3]);
         assert_eq!(input.back(), Some(3));
+    }
+
+    #[test]
+    fn push_back_adds_a_node_to_the_end_of_linked_list() {
+        let mut actual = LinkedList::new();
+        actual.push_back(1);
+        assert_eq!(actual, LinkedList::from(vec![1]));
+    }
+
+    #[test]
+    fn push_back_adds_several_nodes_to_the_end_of_linked_list() {
+        let mut actual = LinkedList::new();
+        actual.push_back(1);
+        actual.push_back(2);
+        actual.push_back(3);
+        assert_eq!(actual, LinkedList::from(vec![1, 2, 3]));
     }
 
     #[test]
