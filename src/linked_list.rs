@@ -1,17 +1,17 @@
 #[derive(Debug)]
-pub struct LinkedList {
-    root: Option<Box<Node>>,
+pub struct LinkedList<T> {
+    root: Option<Box<Node<T>>>,
     size: usize,
 }
 
 #[derive(Debug)]
-struct Node {
-    next: Option<Box<Node>>,
-    value: i32,
+struct Node<T> {
+    next: Option<Box<Node<T>>>,
+    value: T,
 }
 
-impl LinkedList {
-    pub fn new() -> LinkedList {
+impl<T> LinkedList<T> {
+    pub fn new() -> Self {
         LinkedList {
             root: None,
             size: 0,
@@ -26,14 +26,14 @@ impl LinkedList {
         self.size == 0
     }
 
-    pub fn front(&self) -> Option<i32> {
+    pub fn front(&self) -> Option<&T> {
         match &self.root {
-            Some(first_node) => Some(first_node.value),
+            Some(first_node) => Some(&first_node.value),
             None => None,
         }
     }
 
-    pub fn push_front(&mut self, input: i32) {
+    pub fn push_front(&mut self, input: T) {
         let old_root = self.root.take();
         let new_node = Node {
             next: old_root,
@@ -44,7 +44,7 @@ impl LinkedList {
         self.size += 1;
     }
 
-    pub fn pop_front(&mut self) -> Option<i32> {
+    pub fn pop_front(&mut self) -> Option<T> {
         let Some(popped_node) = self.root.take() else {
             return None;
         };
@@ -54,7 +54,7 @@ impl LinkedList {
         Some(popped_node.value)
     }
 
-    pub fn back(&self) -> Option<i32> {
+    pub fn back(&self) -> Option<&T> {
         let Some(root_node) = self.root.as_ref() else {
             return None;
         };
@@ -63,10 +63,10 @@ impl LinkedList {
         while let Some(next) = last.next.as_ref() {
             last = next.as_ref();
         }
-        Some(last.value)
+        Some(&last.value)
     }
 
-    pub fn push_back(&mut self, input: i32) {
+    pub fn push_back(&mut self, input: T) {
         let new_node = Some(Box::new(Node {
             next: None,
             value: input,
@@ -86,33 +86,21 @@ impl LinkedList {
         self.size += 1;
     }
 
-    pub fn pop_back(&mut self) -> Option<i32> {
-        let Some(root_node) = self.root.as_mut() else {
+    pub fn pop_back(&mut self) -> Option<T> {
+        let mut last = &mut self.root;
+        while last.as_ref().is_some_and(|last| last.next.is_some()) {
+            last = &mut last.as_mut().unwrap().next;
+        }
+        let Some(last) = last.take() else {
             return None;
         };
-
-        if root_node.next.is_none() {
-            let taken = self.root.take();
-            self.size -= 1;
-            return Some(taken.unwrap().value);
-        }
-
-        let mut second_to_last = root_node.as_mut();
-        while second_to_last
-            .next
-            .as_ref()
-            .is_some_and(|last| last.next.is_some())
-        {
-            second_to_last = second_to_last.next.as_mut().unwrap();
-        }
-        let taken = second_to_last.next.take();
         self.size -= 1;
-        return Some(taken.unwrap().value);
+        return Some(last.value);
     }
 }
 
-impl From<Vec<i32>> for LinkedList {
-    fn from(value: Vec<i32>) -> Self {
+impl<T> From<Vec<T>> for LinkedList<T> {
+    fn from(value: Vec<T>) -> Self {
         let mut output = LinkedList::new();
 
         for item in value.into_iter().rev() {
@@ -123,8 +111,8 @@ impl From<Vec<i32>> for LinkedList {
     }
 }
 
-impl From<&[i32]> for LinkedList {
-    fn from(value: &[i32]) -> Self {
+impl<T: Clone> From<&[T]> for LinkedList<T> {
+    fn from(value: &[T]) -> Self {
         let mut output = LinkedList::new();
 
         for item in value.iter().cloned().rev() {
@@ -135,8 +123,8 @@ impl From<&[i32]> for LinkedList {
     }
 }
 
-impl Into<Vec<i32>> for LinkedList {
-    fn into(mut self) -> Vec<i32> {
+impl<T> Into<Vec<T>> for LinkedList<T> {
+    fn into(mut self) -> Vec<T> {
         let mut output = Vec::new();
 
         while let Some(item) = self.pop_front() {
@@ -147,13 +135,13 @@ impl Into<Vec<i32>> for LinkedList {
     }
 }
 
-impl PartialEq for LinkedList {
+impl<T: PartialEq> PartialEq for LinkedList<T> {
     fn eq(&self, other: &Self) -> bool {
         self.root == other.root && self.size == other.size
     }
 }
 
-impl PartialEq for Node {
+impl<T: PartialEq> PartialEq for Node<T> {
     fn eq(&self, other: &Self) -> bool {
         self.next == other.next && self.value == other.value
     }
@@ -182,7 +170,7 @@ mod test {
 
     #[test]
     fn is_empty_returns_true_for_a_fresh_empty_list() {
-        let list = LinkedList::new();
+        let list = LinkedList::<i32>::new();
         assert_eq!(list.is_empty(), true);
     }
 
@@ -209,7 +197,7 @@ mod test {
         list.push_front(3);
         list.push_front(2);
 
-        assert_eq!(list.front(), Some(2));
+        assert_eq!(list.front(), Some(&2));
     }
 
     #[test]
@@ -267,7 +255,7 @@ mod test {
 
     #[test]
     fn pop_front_on_empty_list_pops_nothing() {
-        let mut actual = LinkedList::new();
+        let mut actual = LinkedList::<i32>::new();
         assert_eq!(actual.pop_front(), None);
         assert_eq!(actual.length(), 0)
     }
@@ -275,7 +263,7 @@ mod test {
     #[test]
     fn back_returns_an_option_of_the_last_value() {
         let input = LinkedList::from(vec![1, 2, 3]);
-        assert_eq!(input.back(), Some(3));
+        assert_eq!(input.back(), Some(&3));
     }
 
     #[test]
@@ -296,7 +284,7 @@ mod test {
 
     #[test]
     fn pop_back_returns_nothing_for_empty_linked_list() {
-        let mut actual = LinkedList::new();
+        let mut actual = LinkedList::<i32>::new();
         assert_eq!(actual.pop_back(), None);
         assert_eq!(actual, LinkedList::new());
     }
