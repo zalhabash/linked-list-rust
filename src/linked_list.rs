@@ -165,7 +165,31 @@ mod test {
         assert_eq!(list.length(), 2);
 
         list.push_front(4);
-        assert_eq!(list.length(), 3)
+        assert_eq!(list.length(), 3);
+
+        let mut list = LinkedList::new();
+        assert_eq!(list.length(), 0);
+
+        list.push_front("a".to_string());
+        assert_eq!(list.length(), 1);
+
+        list.push_front("b".to_string());
+        assert_eq!(list.length(), 2);
+
+        list.push_front("c".to_string());
+        assert_eq!(list.length(), 3);
+
+        let mut list = LinkedList::new();
+        assert_eq!(list.length(), 0);
+
+        list.push_front(1.1);
+        assert_eq!(list.length(), 1);
+
+        list.push_front(2.2);
+        assert_eq!(list.length(), 2);
+
+        list.push_front(3.3);
+        assert_eq!(list.length(), 3);
     }
 
     #[test]
@@ -359,7 +383,7 @@ mod test {
     }
 
     #[test]
-    fn construct_linked_list_from_vector() {
+    fn construct_linked_list_from_vector_of_i32() {
         let input: Vec<i32> = vec![1, 2, 3];
         let actual = LinkedList::from(input);
         // let actual = input.into();
@@ -376,11 +400,11 @@ mod test {
             })),
             size: 3,
         };
-        assert_eq!(expected, actual);
+        assert_eq!(actual, expected);
     }
 
     #[test]
-    fn construct_linked_list_from_vector_without_taking_ownership() {
+    fn construct_linked_list_from_vector_of_i32_without_taking_ownership() {
         let input = [1, 2, 3];
         let actual = LinkedList::from(input.as_slice());
         // let actual = input.into();
@@ -397,11 +421,47 @@ mod test {
             })),
             size: 3,
         };
-        assert_eq!(expected, actual);
+        assert_eq!(actual, expected);
     }
 
     #[test]
-    fn construct_vector_from_linked_list() {
+    fn construct_linked_list_from_vector_of_string() {
+        let input = vec!["a".to_string(), "b".to_string()];
+        let actual = LinkedList::from(input);
+        let expected = LinkedList {
+            root: Some(Box::new(Node {
+                value: "a".to_string(),
+                next: Some(Box::new(Node {
+                    value: "b".to_string(),
+                    next: None,
+                })),
+            })),
+            size: 2,
+        };
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn construct_linked_list_from_vector_of_floats() {
+        let input = vec![1.0, 2.0];
+        let actual = LinkedList::from(input);
+        let expected = LinkedList {
+            root: Some(Box::new(Node {
+                value: 1.0,
+                next: Some(Box::new(Node {
+                    value: 2.0,
+                    next: None,
+                })),
+            })),
+            size: 2,
+        };
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn construct_vector_from_linked_list_of_i32() {
         let input = LinkedList {
             root: Some(Box::new(Node {
                 value: 1,
@@ -417,6 +477,6 @@ mod test {
         };
         let expected = vec![1, 2, 3];
         let actual: Vec<i32> = input.into();
-        assert_eq!(expected, actual);
+        assert_eq!(actual, expected);
     }
 }
