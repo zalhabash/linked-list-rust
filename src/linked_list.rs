@@ -149,8 +149,6 @@ impl<T: PartialEq> PartialEq for Node<T> {
 
 #[cfg(test)]
 mod test {
-    use std::vec;
-
     use super::*;
 
     #[test]
