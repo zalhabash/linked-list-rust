@@ -141,11 +141,15 @@ impl<T: PartialEq> PartialEq for LinkedList<T> {
     }
 }
 
+impl<T: Eq> Eq for LinkedList<T> {}
+
 impl<T: PartialEq> PartialEq for Node<T> {
     fn eq(&self, other: &Self) -> bool {
         self.next == other.next && self.value == other.value
     }
 }
+
+impl<T: Eq> Eq for Node<T> {}
 
 #[cfg(test)]
 mod test {
@@ -338,7 +342,7 @@ mod test {
     }
 
     #[test]
-    fn identical_nodes_are_equal_to_each_other() {
+    fn identical_nodes_are_partially_equal_to_each_other() {
         let a = Node {
             next: None,
             value: 5,
@@ -365,11 +369,11 @@ mod test {
 
         assert_ne!(a, b);
 
-        let c = Node {
+        let a = Node {
             next: None,
             value: 5,
         };
-        let d = Node {
+        let b = Node {
             next: Some(Box::new(Node {
                 next: None,
                 value: 5,
@@ -377,7 +381,7 @@ mod test {
             value: 5,
         };
 
-        assert_ne!(c, d);
+        assert_ne!(a, b);
     }
 
     #[test]
