@@ -459,6 +459,14 @@ mod test {
     }
 
     #[test]
+    fn assert_a_linked_list_containing_nan_is_not_equal_to_itself() {
+        let input = vec![f64::NAN];
+        let list = LinkedList::from(input);
+
+        assert_ne!(list, list);
+    }
+
+    #[test]
     fn construct_vector_from_linked_list_of_i32() {
         let input = LinkedList {
             root: Some(Box::new(Node {
