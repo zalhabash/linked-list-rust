@@ -152,7 +152,7 @@ impl<T: PartialEq> PartialEq for Node<T> {
 impl<T: Eq> Eq for Node<T> {}
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]
