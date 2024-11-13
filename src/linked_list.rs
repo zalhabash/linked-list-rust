@@ -98,7 +98,7 @@ impl<T> LinkedList<T> {
             return None;
         };
         self.size -= 1;
-        return Some(last.value);
+        Some(last.value)
     }
 
     pub fn iter(&self) -> Iter<T> {
