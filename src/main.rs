@@ -8,9 +8,13 @@ fn main() {
     list.push_back(6);
     list.pop_front();
     list.pop_back();
+    list.push_back(10);
     println!("Is empty: {}", list.is_empty());
     println!("Length: {}", list.length());
     println!("{list:?}");
     println!("Front: {}", list.front().unwrap());
     println!("Back: {}", list.back().unwrap());
+    for item in list.iter() {
+        println!("Item: {}", item);
+    }
 }

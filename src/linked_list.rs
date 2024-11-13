@@ -1,3 +1,6 @@
+mod iterators;
+use iterators::Iter;
+
 #[derive(Debug)]
 pub struct LinkedList<T> {
     root: Option<Box<Node<T>>>,
@@ -96,6 +99,10 @@ impl<T> LinkedList<T> {
         };
         self.size -= 1;
         return Some(last.value);
+    }
+
+    pub fn iter(&self) -> Iter<T> {
+        Iter::new(self)
     }
 }
 
@@ -488,5 +495,16 @@ mod tests {
         let expected = vec![1, 2, 3];
         let actual: Vec<i32> = input.into();
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn construct_iter_from_linked_list() {
+        let list: LinkedList<i32> = vec![1, 2, 3].into();
+        let mut iter = list.iter();
+        assert_eq!(iter.next(), Some(&1));
+        assert_eq!(iter.next(), Some(&2));
+        assert_eq!(iter.next(), Some(&3));
+        assert_eq!(iter.next(), None);
+        assert_eq!(iter.next(), None);
     }
 }
