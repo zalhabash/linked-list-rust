@@ -14,13 +14,20 @@ fn main() {
     println!("{list:?}");
     println!("Front: {}", list.front().unwrap());
     println!("Back: {}", list.back().unwrap());
+
     println!("Items:");
     for item in list.iter() {
         println!("   {}", item);
     }
+
     println!("Items plus 3:");
     for item in list.iter_mut() {
         *item += 3;
+        println!("   {}", item);
+    }
+
+    println!("Last time we see the items:");
+    for item in list {
         println!("   {}", item);
     }
 }

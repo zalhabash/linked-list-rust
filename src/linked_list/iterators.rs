@@ -52,6 +52,29 @@ impl<'a, T> Iterator for IterMut<'a, T> {
     }
 }
 
+#[derive(Debug)]
+pub struct IntoIter<T> {
+    list: LinkedList<T>,
+}
+
+impl<T> IntoIter<T> {
+    pub fn new(list: LinkedList<T>) -> Self {
+        IntoIter { list }
+    }
+}
+
+impl<T> Iterator for IntoIter<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.list.pop_front()
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.list.size, Some(self.list.size))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -71,13 +94,36 @@ mod tests {
     #[test]
     fn mutably_borrowing_iterator_allows_mutation_of_values() {
         let mut list: LinkedList<i32> = vec![1, 2, 3].into();
-        let mut mut_iterator = IterMut::new(&mut list);
+        let mut iterator_mut = IterMut::new(&mut list);
 
-        *mut_iterator.next().unwrap() = 4;
-        *mut_iterator.next().unwrap() = 5;
-        *mut_iterator.next().unwrap() = 6;
+        *iterator_mut.next().unwrap() = 4;
+        *iterator_mut.next().unwrap() = 5;
+        *iterator_mut.next().unwrap() = 6;
 
-        assert_eq!(mut_iterator.next(), None);
+        assert_eq!(iterator_mut.next(), None);
         assert_eq!(list, vec![4, 5, 6].into());
+    }
+
+    #[test]
+    fn ownership_iterator_consumes_list() {
+        let list: LinkedList<i32> = vec![1, 2, 3].into();
+        let mut iterator_once = IntoIter::new(list);
+
+        assert_eq!(iterator_once.next(), Some(1));
+        assert_eq!(iterator_once.next(), Some(2));
+        assert_eq!(iterator_once.next(), Some(3));
+        assert_eq!(iterator_once.next(), None);
+        assert_eq!(iterator_once.next(), None);
+    }
+
+    #[test]
+    fn ownership_iterator_size_hint_returns_precise_size() {
+        let list: LinkedList<i32> = vec![1, 2, 3].into();
+        let mut iterator_once = IntoIter::new(list);
+
+        assert_eq!(iterator_once.size_hint(), (3, Some(3)));
+
+        iterator_once.next();
+        assert_eq!(iterator_once.size_hint(), (2, Some(2)));
     }
 }
