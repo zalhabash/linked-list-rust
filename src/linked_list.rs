@@ -1,5 +1,5 @@
 mod iterators;
-use iterators::Iter;
+use iterators::{Iter, IterMut};
 
 #[derive(Debug)]
 pub struct LinkedList<T> {
@@ -103,6 +103,10 @@ impl<T> LinkedList<T> {
 
     pub fn iter(&self) -> Iter<T> {
         Iter::new(self)
+    }
+
+    pub fn iter_mut(&mut self) -> IterMut<T> {
+        IterMut::new(self)
     }
 }
 
@@ -506,5 +510,17 @@ mod tests {
         assert_eq!(iter.next(), Some(&3));
         assert_eq!(iter.next(), None);
         assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn construct_iter_mut_from_linked_list() {
+        let mut list: LinkedList<i32> = vec![1, 2, 3].into();
+        let iter_mut = list.iter_mut();
+
+        for value in iter_mut {
+            *value += 3;
+        }
+
+        assert_eq!(list, vec![4, 5, 6].into());
     }
 }
